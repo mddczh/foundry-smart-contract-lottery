@@ -1,66 +1,12 @@
-## Foundry
+# 🎟️ 可验证随机抽奖合约（Proveably Random Raffle Contracts）
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## 📌 项目简介
 
-Foundry consists of:
+本代码用于创建一个 **可验证随机性的智能合约彩票** 🎲。
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## 🎯 我们希望它具备哪些功能？
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+1. 🎟️ 用户可以 **支付门票费用** 参与抽奖，所有门票费将成为中奖者的奖励。  
+2. ⏳ **自动开奖**，每隔一段时间合约会自动选出中奖者。  
+3. 🔗 **Chainlink VRF** 生成 **可验证的随机数**。  
+4. 🤖 **Chainlink 自动化** 定期触发抽奖流程。  
