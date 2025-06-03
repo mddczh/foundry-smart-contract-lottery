@@ -30,15 +30,6 @@ import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/V
 import {AutomationCompatibleInterface} from
     "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 
-event Raffle__EnterRaffle(address indexed player);
-
-event Raffle__PickedWinner(address winner);
-
-error Raffle__NotEnoughETHSent();
-error Raffle__TransferFailed();
-error Raffle__RaffleNotOpen();
-error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 timePassed, uint256 raffleState);
-
 /**
  * @title 一个抽奖合约示例
  * @author cyc
@@ -68,6 +59,15 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     uint256 private s_lastTimeStamp;
     address private s_recentWinner;
     RaffleState private s_raffleState;
+
+    event Raffle__EnterRaffle(address indexed player);
+
+    event Raffle__PickedWinner(address winner);
+
+    error Raffle__NotEnoughETHSent();
+    error Raffle__TransferFailed();
+    error Raffle__RaffleNotOpen();
+    error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 timePassed, uint256 raffleState);
 
     constructor(
         uint256 entranceFee,
@@ -107,7 +107,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
         s_raffleState = RaffleState.CALCULATING;
 
-        uint256 requestId = s_vrfCoordinator.requestRandomWords(
+        s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane,
                 subId: i_subscriptionId,
@@ -144,7 +144,11 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
 
     // VRF 回调函数，对随机数的处理操作
-    function fulfillRandomWords(uint256, /*requestId*/ uint256[] calldata randomWords) internal override {
+    function fulfillRandomWords(
+        uint256,
+        /*requestId*/
+        uint256[] calldata randomWords
+    ) internal override {
         uint256 winnerIndex = randomWords[0] % s_players.length;
         address payable winner = s_players[winnerIndex];
 
@@ -161,7 +165,15 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         emit Raffle__PickedWinner(winner);
     }
 
-    function getEntranceFee() public view returns (uint256) {
+    function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
+    }
+
+    function getRaffleState() external view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getPlayers() external view returns (address payable[] memory) {
+        return s_players;
     }
 }

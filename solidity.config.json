@@ -1,0 +1,9 @@
+{
+    "compilerVersion": "0.8.28",
+    "includePaths": [
+        "lib"
+    ],
+    "remappings": [
+        "@chainlink/=lib/chainlink-brownie-contracts/"
+    ]
+}
