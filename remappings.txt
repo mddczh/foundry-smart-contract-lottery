@@ -1,7 +1,9 @@
 @chainlink/=lib/chainlink-brownie-contracts/
 @solmate/=lib/solmate/src/
+@foundry-devops/=lib/foundry-devops/
 chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/
 ds-test/=lib/solmate/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
+foundry-devops/=lib/foundry-devops/
 solmate/=lib/solmate/src/
 weird-erc20/=lib/solmate/lib/weird-erc20/src/

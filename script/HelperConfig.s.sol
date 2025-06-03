@@ -4,9 +4,10 @@ pragma solidity ^0.8.28;
 import {Script} from "forge-std/Script.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {LinkToken} from "test/mocks/LinkToken.sol";
+import {console} from "forge-std/console.sol";
 
 abstract contract CodeConstants {
-    uint256 public constant ETH_SPEOLIA_CHAIN_ID = 11155111;
+    uint256 public constant ETH_SEPOLIA_CHAIN_ID = 11155111;
     uint256 public constant LOCAL_CHAIN_ID = 31337;
 
     /* VRF 模拟参数 */
@@ -30,6 +31,7 @@ contract HelperConfig is CodeConstants, Script {
         uint256 subscriptionId;
         uint32 callbackGasLimit;
         address linkToken;
+        address account;
     }
 
     NetworkConfig internal localNetworkConfig;
@@ -39,7 +41,7 @@ contract HelperConfig is CodeConstants, Script {
     error HelperConfig__NoConfigForChainId(uint256 chainId);
 
     constructor() {
-        networkConfigs[ETH_SPEOLIA_CHAIN_ID] = getEthSepoliaConfig();
+        networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getEthSepoliaConfig();
     }
 
     /**
@@ -68,9 +70,10 @@ contract HelperConfig is CodeConstants, Script {
             interval: 30,
             vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-            subscriptionId: 22556376891597629229536621055545287048965084039999932745646553582846786916532, // sepolia 上创建的真是的订阅 id
+            subscriptionId: 22556376891597629229536621055545287048965084039999932745646553582846786916532, // sepolia 上创建的真实的订阅 id
             callbackGasLimit: 500000,
-            linkToken: 0x779877A7B0D9E8603169DdbD7836e478b4624789
+            linkToken: 0x779877A7B0D9E8603169DdbD7836e478b4624789,
+            account: 0xb574cd981DCBd14f94f5E3bdaE35c38F3cAb08db
         });
     }
 
@@ -102,7 +105,8 @@ contract HelperConfig is CodeConstants, Script {
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae, // 本地网络 gaslane 不重要
             subscriptionId: 0,
             callbackGasLimit: 500000,
-            linkToken: address(linkToken)
+            linkToken: address(linkToken),
+            account: 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
         });
 
         return localNetworkConfig;

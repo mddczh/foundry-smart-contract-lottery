@@ -61,13 +61,14 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     RaffleState private s_raffleState;
 
     event Raffle__EnterRaffle(address indexed player);
-
     event Raffle__PickedWinner(address winner);
+    event Raffle__RequestedRaffleWinner(uint256 indexed requestId);
+    event Raffle__WinnerCannotReceiveETH(address indexed winner, uint256 amount);
 
     error Raffle__NotEnoughETHSent();
     error Raffle__TransferFailed();
     error Raffle__RaffleNotOpen();
-    error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 timePassed, uint256 raffleState);
+    error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
     constructor(
         uint256 entranceFee,
@@ -100,14 +101,11 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     function performUpkeep(bytes calldata /* performData */ ) external override {
         (bool upkeepNeeded,) = checkUpkeep("");
         if (!upkeepNeeded) {
-            revert Raffle__UpkeepNotNeeded(
-                address(this).balance, s_players.length, block.timestamp - s_lastTimeStamp, uint256(s_raffleState)
-            );
+            revert Raffle__UpkeepNotNeeded(address(this).balance, s_players.length, uint256(s_raffleState));
         }
 
         s_raffleState = RaffleState.CALCULATING;
-
-        s_vrfCoordinator.requestRandomWords(
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane,
                 subId: i_subscriptionId,
@@ -117,6 +115,8 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                 extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: ENABLE_NATIVE_PAYMENT}))
             })
         );
+
+        emit Raffle__RequestedRaffleWinner(requestId);
     }
 
     /**
@@ -158,11 +158,16 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         s_players = new address payable[](0);
         s_lastTimeStamp = block.timestamp;
 
+        emit Raffle__PickedWinner(winner);
+
         // 发送奖金
         (bool success,) = winner.call{value: address(this).balance}("");
-        if (!success) revert Raffle__TransferFailed();
-
-        emit Raffle__PickedWinner(winner);
+        if (!success) {
+            // 用于测试
+            emit Raffle__WinnerCannotReceiveETH(winner, address(this).balance);
+            // 发送失败，抛出异常
+            revert Raffle__TransferFailed();
+        }
     }
 
     function getEntranceFee() external view returns (uint256) {
@@ -175,5 +180,13 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
     function getPlayers() external view returns (address payable[] memory) {
         return s_players;
+    }
+
+    function getLastTimeStamp() external view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+
+    function getRecentWinner() external view returns (address) {
+        return s_recentWinner;
     }
 }

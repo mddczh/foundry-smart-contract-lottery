@@ -5,8 +5,17 @@ libs = [
     "lib",
 ]
 
+fs_permissions = [
+    { access = "read", path = "./broadcast" },
+    { access = "read", path = "./reports" },
+]
+
 remappings = [
     '@chainlink/=lib/chainlink-brownie-contracts/',
     '@solmate/=lib/solmate/src/',
+    '@foundry-devops/=lib/foundry-devops/',
 ]
+
+[fuzz]
+runs = 512
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
